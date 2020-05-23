@@ -106,21 +106,30 @@ public class Point implements Comparable<Point> {
      * @return the Comparator that defines this ordering on points
      */
     public Comparator<Point> slopeOrder() {
-        return new BySlope(this);
+        return new BySlope();
     }
 
     private class BySlope implements Comparator<Point> {
-        Point point;
-
-        public BySlope(Point p) {
-            point = p;
-        }
-
         public int compare(Point p1, Point p2) {
+            Point point = new Point(x, y);
             double slope1 = point.slopeTo(p1);
             double slope2 = point.slopeTo(p2);
 
-            return Double.compare(slope1, slope2);
+            if (slope1 == Double.NEGATIVE_INFINITY && slope2 == Double.NEGATIVE_INFINITY)
+                return 0;
+            if (slope1 == Double.NEGATIVE_INFINITY) return -1;
+            if (slope2 == Double.NEGATIVE_INFINITY) return 1;
+
+
+            if (slope1 == Double.POSITIVE_INFINITY && slope2 == Double.POSITIVE_INFINITY)
+                return 0;
+            if (slope1 == Double.POSITIVE_INFINITY) return 1;
+            if (slope2 == Double.POSITIVE_INFINITY) return -1;
+
+
+            if (slope2 < slope1) return 1;
+            if (slope2 > slope1) return -1;
+            return 0;
         }
     }
 

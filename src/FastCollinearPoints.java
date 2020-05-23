@@ -33,17 +33,19 @@ public class FastCollinearPoints {
         Point[] collinearPoints = new Point[points.length];
         int lastCollinearPointIdx = -1;
 
+        Point[] pointsCopy = new Point[points.length];
         for (int i = 0; i < points.length; i++) {
-            Point initPoint = points[i];
+            pointsCopy[i] = points[i];
+        }
+
+        for (int i = 0; i < pointsCopy.length; i++) {
+            Point initPoint = pointsCopy[i];
             Point[] checkPoints = new Point[points.length];
             int lastCheckPointIdx = -1;
             checkPoints[++lastCheckPointIdx] = initPoint;
             Arrays.sort(points, initPoint.slopeOrder());
 
-            for (int j = 0; j < points.length; j++) {
-                if (j == i) {
-                    continue;
-                }
+            for (int j = 1; j < points.length; j++) {
                 if (j + 1 == points.length) {
                     break;
                 }
