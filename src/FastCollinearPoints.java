@@ -5,7 +5,7 @@ import edu.princeton.cs.algs4.StdOut;
 import java.util.Arrays;
 
 public class FastCollinearPoints {
-    private LineSegment[] lineSegments;
+    private final LineSegment[] lineSegments;
 
     // finds all line segments containing 4 or more points
     public FastCollinearPoints(Point[] points) {
@@ -62,11 +62,14 @@ public class FastCollinearPoints {
 
             if (lastCheckPointIdx >= 3) {
                 Point[] sortedCheckPoints = new Point[lastCheckPointIdx + 1];
-                int k = 0;
-                while (checkPoints[k] != null) {
-                    sortedCheckPoints[k] = checkPoints[k];
-                    k++;
+
+                for (int j = 0; j < checkPoints.length; j++) {
+                    if (checkPoints[j] == null) {
+                        break;
+                    }
+                    sortedCheckPoints[j] = checkPoints[j];
                 }
+
                 Arrays.sort(sortedCheckPoints);
 
                 boolean hasSameCollinearLine = false;
