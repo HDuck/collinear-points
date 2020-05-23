@@ -9,11 +9,13 @@
  ******************************************************************************/
 
 import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.StdIn;
+import edu.princeton.cs.algs4.StdOut;
 
+import java.util.Arrays;
 import java.util.Comparator;
 
 public class Point implements Comparable<Point> {
-
     private final int x;     // x-coordinate of this point
     private final int y;     // y-coordinate of this point
 
@@ -60,7 +62,22 @@ public class Point implements Comparable<Point> {
      * @return the slope between this point and the specified point
      */
     public double slopeTo(Point that) {
-        /* YOUR CODE HERE */
+        double yDiff = that.y - this.y;
+        double xDiff = that.x - this.x;
+
+        if (xDiff == 0.0 && yDiff == 0.0) {
+            return Double.NEGATIVE_INFINITY;
+        }
+
+        if (xDiff == 0.0) {
+            return Double.POSITIVE_INFINITY;
+        }
+
+        if (yDiff == 0.0) {
+            return +0.0;
+        }
+
+        return yDiff / xDiff;
     }
 
     /**
@@ -77,6 +94,9 @@ public class Point implements Comparable<Point> {
      */
     public int compareTo(Point that) {
         /* YOUR CODE HERE */
+        if (this.y > that.y) return 1;
+        if (this.y < that.y) return -1;
+        return Integer.compare(this.x, that.x);
     }
 
     /**
@@ -86,9 +106,23 @@ public class Point implements Comparable<Point> {
      * @return the Comparator that defines this ordering on points
      */
     public Comparator<Point> slopeOrder() {
-        /* YOUR CODE HERE */
+        return new BySlope(this);
     }
 
+    private class BySlope implements Comparator<Point> {
+        Point point;
+
+        public BySlope(Point p) {
+            point = p;
+        }
+
+        public int compare(Point p1, Point p2) {
+            double slope1 = point.slopeTo(p1);
+            double slope2 = point.slopeTo(p2);
+
+            return Double.compare(slope1, slope2);
+        }
+    }
 
     /**
      * Returns a string representation of this point.
@@ -106,6 +140,35 @@ public class Point implements Comparable<Point> {
      * Unit tests the Point data type.
      */
     public static void main(String[] args) {
-        /* YOUR CODE HERE */
+        int[] pointCoords = StdIn.readAllInts();
+        int i = 0;
+        int j = 0;
+        Point[] points = new Point[pointCoords.length / 2];
+
+        while (i < pointCoords.length) {
+            int x = pointCoords[i++];
+            int y = pointCoords[i++];
+            points[j] = new Point(x, y);
+            StdOut.println(points[j].toString());
+            j++;
+        }
+
+        StdOut.println("slope-order by first point");
+        Arrays.sort(points, points[0].slopeOrder());
+        for (int k = 0; k < points.length; k++) {
+            StdOut.println(points[k].toString());
+        }
+
+        StdOut.println("slope-order by forth point");
+        Arrays.sort(points, points[3].slopeOrder());
+        for (int k = 0; k < points.length; k++) {
+            StdOut.println(points[k].toString());
+        }
+
+        Arrays.sort(points);
+        StdOut.println("compareTo-order...");
+        for (int k = 0; k < points.length; k++) {
+            StdOut.println(points[k].toString());
+        }
     }
 }
