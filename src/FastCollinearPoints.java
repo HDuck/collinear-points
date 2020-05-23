@@ -5,7 +5,7 @@ import edu.princeton.cs.algs4.StdOut;
 import java.util.Arrays;
 
 public class FastCollinearPoints {
-    private final Point[] collinearPoints;
+    private LineSegment[] lineSegments;
 
     // finds all line segments containing 4 or more points
     public FastCollinearPoints(Point[] points) {
@@ -30,7 +30,7 @@ public class FastCollinearPoints {
             initialCheckedPoints[i] = currentPoint;
         }
 
-        collinearPoints = new Point[points.length];
+        Point[] collinearPoints = new Point[points.length];
         int lastCollinearPointIdx = -1;
 
         for (int i = 0; i < points.length; i++) {
@@ -90,32 +90,34 @@ public class FastCollinearPoints {
                 collinearPoints[++lastCollinearPointIdx] = sortedCheckPoints[lastCheckPointIdx];
             }
         }
+
+        int lineSegmentsCount = 0;
+        for (int i = 0; i < collinearPoints.length; i++) {
+            if (i % 2 != 0 && collinearPoints[i] != null) {
+                lineSegmentsCount++;
+            }
+        }
+
+        lineSegments = new LineSegment[lineSegmentsCount];
+        for (int i = 0; i < numberOfSegments(); i++) {
+            Point point1 = collinearPoints[i * 2];
+            Point point2 = collinearPoints[(i * 2) + 1];
+            lineSegments[i] = new LineSegment(point1, point2);
+        }
     }
 
     // the number of line segments
     public int numberOfSegments() {
-        int counter = 0;
-
-        for (int i = 0; i < collinearPoints.length; i++) {
-            if (i % 2 != 0 && collinearPoints[i] != null) {
-                counter++;
-            }
-        }
-
-        return counter;
+        return lineSegments.length;
     }
 
     // the line segments
     public LineSegment[] segments() {
-        LineSegment[] segments = new LineSegment[numberOfSegments()];
-
+        LineSegment[] copy = new LineSegment[numberOfSegments()];
         for (int i = 0; i < numberOfSegments(); i++) {
-            Point point1 = collinearPoints[i * 2];
-            Point point2 = collinearPoints[(i * 2) + 1];
-            segments[i] = new LineSegment(point1, point2);
+            copy[i] = lineSegments[i];
         }
-
-        return segments;
+        return copy;
     }
 
     public static void main(String[] args) {
