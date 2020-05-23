@@ -5,7 +5,7 @@ import edu.princeton.cs.algs4.StdOut;
 import java.util.Arrays;
 
 public class FastCollinearPoints {
-    private Point[] collinearPoints;
+    private final Point[] collinearPoints;
 
     // finds all line segments containing 4 or more points
     public FastCollinearPoints(Point[] points) {
@@ -97,7 +97,7 @@ public class FastCollinearPoints {
         int counter = 0;
 
         for (int i = 0; i < collinearPoints.length; i++) {
-            if (i % 2 == 1 && collinearPoints[i] != null) {
+            if (i % 2 != 0 && collinearPoints[i] != null) {
                 counter++;
             }
         }

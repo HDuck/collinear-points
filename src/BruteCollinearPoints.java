@@ -5,7 +5,7 @@ import edu.princeton.cs.algs4.StdOut;
 import java.util.Arrays;
 
 public class BruteCollinearPoints {
-    private Point[] collinearPoints;
+    private final Point[] collinearPoints;
 
     // finds all line segments containing 4 points
     public BruteCollinearPoints(Point[] points) {
@@ -127,7 +127,7 @@ public class BruteCollinearPoints {
         int counter = 0;
 
         for (int i = 0; i < collinearPoints.length; i++) {
-            if (i % 2 == 1 && collinearPoints[i] != null) {
+            if (i % 2 != 0 && collinearPoints[i] != null) {
                 counter++;
             }
         }
