@@ -120,12 +120,10 @@ public class Point implements Comparable<Point> {
             if (slope1 == Double.NEGATIVE_INFINITY) return -1;
             if (slope2 == Double.NEGATIVE_INFINITY) return 1;
 
-
             if (slope1 == Double.POSITIVE_INFINITY && slope2 == Double.POSITIVE_INFINITY)
                 return 0;
             if (slope1 == Double.POSITIVE_INFINITY) return 1;
             if (slope2 == Double.POSITIVE_INFINITY) return -1;
-
 
             if (slope2 < slope1) return 1;
             if (slope2 > slope1) return -1;

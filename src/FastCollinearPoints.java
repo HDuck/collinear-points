@@ -38,6 +38,7 @@ public class FastCollinearPoints {
 
         Point[] lineSegmentPoints = new Point[points.length * points.length];
         int lastLineSegmentPointIndex = -1;
+        boolean isOneLineGrid = false;
 
         for (Point initPoint : points) {
             Arrays.sort(sortedPoints, initPoint.slopeOrder());
@@ -62,6 +63,8 @@ public class FastCollinearPoints {
                     Point[] collinearLinePoints = sliceCollinearPointsSegment(sortedPoints, initCheckIndex, checkIndex - 1);
                     Arrays.sort(collinearLinePoints);
 
+                    isOneLineGrid = collinearLinePoints.length == sortedPoints.length;
+
                     Point startPoint = collinearLinePoints[0];
                     Point endPoint = collinearLinePoints[collinearLinePoints.length - 1];
 
@@ -70,6 +73,10 @@ public class FastCollinearPoints {
                         lineSegmentPoints[++lastLineSegmentPointIndex] = endPoint;
                     }
                 }
+            }
+
+            if (isOneLineGrid) {
+                break;
             }
         }
 
