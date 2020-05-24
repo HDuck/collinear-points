@@ -40,7 +40,6 @@ public class FastCollinearPoints {
             pointsCopySortable[i] = points[i];
         }
 
-
         for (int i = 0; i < pointsCopy.length; i++) {
             Point initPoint = pointsCopy[i];
             Point[] checkPoints = new Point[points.length];
@@ -55,7 +54,15 @@ public class FastCollinearPoints {
 
                 Point point1 = pointsCopySortable[j];
                 Point point2 = pointsCopySortable[j + 1];
-                if (initPoint.slopeTo(point1) != initPoint.slopeTo(point2)) {
+
+                double slope1 = initPoint.slopeTo(point1);
+                double slope2 = initPoint.slopeTo(point2);
+
+                if (lastCheckPointIdx > 0 && slope1 != slope2) {
+                    break;
+                }
+
+                if (slope1 != slope2) {
                     continue;
                 }
 
