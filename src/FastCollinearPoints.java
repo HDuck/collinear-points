@@ -5,8 +5,8 @@ import edu.princeton.cs.algs4.StdOut;
 import java.util.Arrays;
 
 public class FastCollinearPoints {
+    private static final int MIN_COLLINEAR_SEGMENTS = 4;
     private final LineSegment[] lineSegments;
-    private final static int MIN_COLLINEAR_SEGMENTS = 4;
 
     // finds all line segments containing 4 or more points
     public FastCollinearPoints(Point[] points) {
@@ -36,97 +36,40 @@ public class FastCollinearPoints {
             sortedPoints[i] = points[i];
         }
 
-        Point[] lineSegmentPoints = new Point[points.length * points.length / MIN_COLLINEAR_SEGMENTS];
+        Point[] lineSegmentPoints = new Point[points.length * points.length];
         int lastLineSegmentPointIndex = -1;
 
         for (Point initPoint : points) {
-            Point[] collinearPoints = new Point[points.length];
-            int lastCollinearPointIndex = -1;
-            collinearPoints[++lastCollinearPointIndex] = initPoint;
-
             Arrays.sort(sortedPoints, initPoint.slopeOrder());
-            for (int i = 1; i < sortedPoints.length; i++) {
-                if (i + 1 == sortedPoints.length) {
-                    if (lastCollinearPointIndex >= MIN_COLLINEAR_SEGMENTS - 1) {
-                        int collinearPointsCount = lastCollinearPointIndex + 1;
-                        Point[] clonedCollinearPoints = new Point[collinearPointsCount];
-                        for (int j = 0; j < collinearPointsCount; j++) {
-                            clonedCollinearPoints[j] = collinearPoints[j];
-                        }
 
-                        Arrays.sort(clonedCollinearPoints);
-                        Point firstCollinearPoint = clonedCollinearPoints[0];
-                        Point lastCollinearPoint = clonedCollinearPoints[lastCollinearPointIndex];
+            int checkIndex = 1;
+            while (checkIndex < sortedPoints.length) {
+                int initCheckIndex = checkIndex;
+                Point currentPoint = sortedPoints[initCheckIndex];
+                double currentSlope = initPoint.slopeTo(currentPoint);
+                double nextSlope;
 
-                        boolean hasSameLineSegment = false;
-                        for (int j = 0; j < lineSegmentPoints.length; j += 2) {
-                            Point collinearLineStart = lineSegmentPoints[j];
-                            Point collinearLineEnd = lineSegmentPoints[j + 1];
-
-                            if (collinearLineStart == null || collinearLineEnd == null) {
-                                break;
-                            }
-                            if (collinearLineStart.compareTo(firstCollinearPoint) == 0 && collinearLineEnd.compareTo(lastCollinearPoint) == 0) {
-                                hasSameLineSegment = true;
-                                break;
-                            }
-                        }
-
-                        if (!hasSameLineSegment) {
-                            lineSegmentPoints[++lastLineSegmentPointIndex] = firstCollinearPoint;
-                            lineSegmentPoints[++lastLineSegmentPointIndex] = lastCollinearPoint;
-                        }
+                do {
+                    checkIndex++;
+                    if (checkIndex == sortedPoints.length) {
+                        break;
                     }
-                    break;
-                }
+                    Point nextPoint = sortedPoints[checkIndex];
+                    nextSlope = initPoint.slopeTo(nextPoint);
+                } while (nextSlope == currentSlope);
 
-                Point point1 = sortedPoints[i];
-                Point point2 = sortedPoints[i + 1];
+                if (checkIndex - initCheckIndex >= MIN_COLLINEAR_SEGMENTS - 1) {
+                    Point[] collinearLinePoints = sliceCollinearPointsSegment(sortedPoints, initCheckIndex, checkIndex - 1);
+                    Arrays.sort(collinearLinePoints);
 
-                double slope1 = initPoint.slopeTo(point1);
-                double slope2 = initPoint.slopeTo(point2);
+                    Point startPoint = collinearLinePoints[0];
+                    Point endPoint = collinearLinePoints[collinearLinePoints.length - 1];
 
-                if (slope1 != slope2) {
-                    if (lastCollinearPointIndex >= MIN_COLLINEAR_SEGMENTS - 1) {
-                        int collinearPointsCount = lastCollinearPointIndex + 1;
-                        Point[] clonedCollinearPoints = new Point[collinearPointsCount];
-                        for (int j = 0; j < collinearPointsCount; j++) {
-                            clonedCollinearPoints[j] = collinearPoints[j];
-                        }
-
-                        Arrays.sort(clonedCollinearPoints);
-                        Point firstCollinearPoint = clonedCollinearPoints[0];
-                        Point lastCollinearPoint = clonedCollinearPoints[lastCollinearPointIndex];
-
-                        boolean hasSameLineSegment = false;
-                        for (int j = 0; j < lineSegmentPoints.length; j += 2) {
-                            Point collinearLineStart = lineSegmentPoints[j];
-                            Point collinearLineEnd = lineSegmentPoints[j + 1];
-
-                            if (collinearLineStart == null || collinearLineEnd == null) {
-                                break;
-                            }
-                            if (collinearLineStart.compareTo(firstCollinearPoint) == 0 && collinearLineEnd.compareTo(lastCollinearPoint) == 0) {
-                                hasSameLineSegment = true;
-                                break;
-                            }
-                        }
-
-                        if (!hasSameLineSegment) {
-                            lineSegmentPoints[++lastLineSegmentPointIndex] = firstCollinearPoint;
-                            lineSegmentPoints[++lastLineSegmentPointIndex] = lastCollinearPoint;
-                        }
+                    if (!hasSameLineSegmentPoints(lineSegmentPoints, startPoint, endPoint)) {
+                        lineSegmentPoints[++lastLineSegmentPointIndex] = startPoint;
+                        lineSegmentPoints[++lastLineSegmentPointIndex] = endPoint;
                     }
-
-                    lastCollinearPointIndex = 0;
-                    continue;
                 }
-
-                if (lastCollinearPointIndex == 0) {
-                    collinearPoints[++lastCollinearPointIndex] = point1;
-                }
-
-                collinearPoints[++lastCollinearPointIndex] = point2;
             }
         }
 
@@ -142,6 +85,34 @@ public class FastCollinearPoints {
         for (int j = 0; j < collinearLinesCount; j++) {
             lineSegments[j] = new LineSegment(lineSegmentPoints[j * 2], lineSegmentPoints[(j * 2) + 1]);
         }
+    }
+
+    private Point[] sliceCollinearPointsSegment(Point[] collinearPoints, int startIndex, int endIndex) {
+        Point[] result = new Point[endIndex - startIndex + 2];
+        result[0] = collinearPoints[0];
+
+        int index = 0;
+        while (index < endIndex - startIndex + 1) {
+            result[index + 1] = collinearPoints[startIndex + index];
+            index++;
+        }
+        return result;
+    }
+
+    private boolean hasSameLineSegmentPoints(Point[] lineSegmentPoints, Point startPoint, Point endPoint) {
+        boolean result = false;
+        for (int i = 0; i < lineSegmentPoints.length; i += 2) {
+            Point segmentStart = lineSegmentPoints[i];
+            if (segmentStart == null) {
+                break;
+            }
+            Point segmentEnd = lineSegmentPoints[i + 1];
+            if (segmentStart.compareTo(startPoint) == 0 && segmentEnd.compareTo(endPoint) == 0) {
+                result = true;
+                break;
+            }
+        }
+        return result;
     }
 
     // the number of line segments
